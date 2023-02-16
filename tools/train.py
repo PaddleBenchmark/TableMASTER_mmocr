@@ -33,6 +33,10 @@ def parse_args():
         '--no-validate',
         action='store_true',
         help='Whether not to evaluate the checkpoint during training.')
+    parser.add_argument(
+        '--torchcompile',
+        action='store_true',
+        help='Whether not to evaluate the checkpoint during training.')
     group_gpus = parser.add_mutually_exclusive_group()
     group_gpus.add_argument(
         '--gpus',
@@ -183,7 +187,8 @@ def main():
         cfg.model,
         train_cfg=cfg.get('train_cfg'),
         test_cfg=cfg.get('test_cfg'))
-
+    if args.torchcompile:
+        model = torch.compile(model)
     datasets = [build_dataset(cfg.data.train)]
     if len(cfg.workflow) == 2:
         val_dataset = copy.deepcopy(cfg.data.val)
